@@ -1,4 +1,4 @@
-package com.registry.verg.livestock.entity;
+package com.registry.verg.{{service_name_lower}}.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -19,13 +19,13 @@ import org.hibernate.annotations.Type;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "liveStock")
+@Table(name = "{{service_name_lower}}")
 @Entity
-public class LiveStockEntity {
+public class {{service_name_pascal}}Entity {
     @Id
-    private String liveStockId;
+    private String {{service_name_camel}}Id;
 
-    @Type(JsonBinaryType.class)  // ✅ New Hibernate 6 syntax
+    @Type(JsonBinaryType.class)
     @Column(columnDefinition = "jsonb")
     private JsonNode data;
 

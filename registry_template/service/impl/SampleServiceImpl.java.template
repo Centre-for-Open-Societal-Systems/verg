@@ -1,4 +1,4 @@
-package com.registry.verg.livestock.service.impl;
+package com.registry.verg.{{service_name_lower}}.service.impl;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -18,9 +18,9 @@ import com.registry.verg.core.exception.CustomException;
 import com.registry.verg.core.util.Constants;
 import com.registry.verg.core.util.PayloadValidation;
 import com.registry.verg.core.util.VergProperties;
-import com.registry.verg.livestock.repository.LiveStockRepository;
-import com.registry.verg.livestock.service.LiveStockService;
-import com.registry.verg.livestock.entity.LiveStockEntity;
+import com.registry.verg.{{service_name_lower}}.entity.{{service_name_pascal}}Entity;
+import com.registry.verg.{{service_name_lower}}.repository.{{service_name_pascal}}Repository;
+import com.registry.verg.{{service_name_lower}}.service.{{service_name_pascal}}Service;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,12 +40,12 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @Slf4j
-public class LiveStockServiceImpl implements LiveStockService {
+public class {{service_name_pascal}}ServiceImpl implements {{service_name_pascal}}Service {
     @Autowired
     private PayloadValidation payloadValidation;
 
     @Autowired
-    private LiveStockRepository liveStockRepository;
+    private {{service_name_pascal}}Repository {{service_name_camel}}Repository;
 
     @Autowired
     private ESUtilService esUtilService;
@@ -58,69 +58,68 @@ public class LiveStockServiceImpl implements LiveStockService {
 
     @Autowired
     private RedisTemplate<String, SearchResult> redisTemplate;
+
     @Autowired
     private VergProperties vergProperties;
 
-    private Logger logger = LoggerFactory.getLogger(LiveStockServiceImpl.class);
+    private Logger logger = LoggerFactory.getLogger({{service_name_pascal}}ServiceImpl.class);
 
     @Value("${spring.redis.cacheTtl}")
     private long searchResultRedisTtl;
 
     @Override
-    public CustomResponse createLiveStock(JsonNode liveStockEntity) {
-        log.info("InterestServiceImpl::createInterest:entered the method: " + liveStockEntity);
+    public CustomResponse create{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity) {
+        log.info("{{service_name_pascal}}ServiceImpl::create{{service_name_pascal}}:entered the method: " + {{service_name_camel}}Entity);
         CustomResponse response = new CustomResponse();
-        payloadValidation.validatePayload(Constants.LIVESTOCK_VALIDATION_FILE_JSON, liveStockEntity);
+        payloadValidation.validatePayload(Constants.{{service_name_upper}}_VALIDATION_FILE_JSON, {{service_name_camel}}Entity);
 
-
-        log.debug("InterestServiceImpl::createInterest:validated the payload");
+        log.debug("{{service_name_pascal}}ServiceImpl::create{{service_name_pascal}}:validated the payload");
         try {
-            log.info("InterestServiceImpl::createInterest:creating interest");
-            LiveStockEntity liveStockEntity1 = new LiveStockEntity();
+            log.info("{{service_name_pascal}}ServiceImpl::create{{service_name_pascal}}:creating {{service_name_camel}}");
+            {{service_name_pascal}}Entity {{service_name_camel}}Entity1 = new {{service_name_pascal}}Entity();
             // Generate Primary Key
-            UUID interestIdUuid = Uuids.timeBased();
-            String primaryID = String.valueOf(interestIdUuid);
-            liveStockEntity1.setLiveStockId(primaryID);
+            UUID idUuid = Uuids.timeBased();
+            String primaryID = String.valueOf(idUuid);
+            {{service_name_camel}}Entity1.set{{service_name_pascal}}Id(primaryID);
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
-            liveStockEntity1.setCreatedOn(currentTime);
-            liveStockEntity1.setUpdatedOn(currentTime);
-            liveStockEntity1.setStatus(Constants.ACTIVE);
-            liveStockEntity1.setData(liveStockEntity);
+            {{service_name_camel}}Entity1.setCreatedOn(currentTime);
+            {{service_name_camel}}Entity1.setUpdatedOn(currentTime);
+            {{service_name_camel}}Entity1.setStatus(Constants.ACTIVE);
+            {{service_name_camel}}Entity1.setData({{service_name_camel}}Entity);
 
-            liveStockRepository.save(liveStockEntity1);
+            {{service_name_camel}}Repository.save({{service_name_camel}}Entity1);
 
-            log.info("LiveStockServiceImpl::createLiveStock::persisted livestock in postgres");
+            log.info("{{service_name_pascal}}ServiceImpl::create{{service_name_pascal}}::persisted {{service_name_camel}} in postgres");
             ObjectNode jsonNode = objectMapper.createObjectNode();
-            jsonNode.put("LiveStockID",
-                    liveStockEntity.get(Constants.LIVESTOCK_ID_RQST).asText());
-            jsonNode.setAll((ObjectNode) liveStockEntity);
+            jsonNode.put("{{service_name_pascal}}ID",
+                    {{service_name_camel}}Entity.get(Constants.{{service_name_upper}}_ID_RQST).asText());
+            jsonNode.setAll((ObjectNode) {{service_name_camel}}Entity);
             Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
-            esUtilService.addDocument(Constants.LIVESTOCK_INDEX_NAME, Constants.INDEX_TYPE,
-                    String.valueOf(primaryID), map, vergProperties.getElasticLiveStockJsonPath());
+            esUtilService.addDocument(Constants.{{service_name_upper}}_INDEX_NAME, Constants.INDEX_TYPE,
+                    String.valueOf(primaryID), map, vergProperties.getElastic{{service_name_pascal}}JsonPath());
             cacheService.putCache(primaryID, jsonNode);
             response.setMessage(Constants.SUCCESSFULLY_CREATED);
-            map.put(Constants.LIVESTOCK_ID_RQST, primaryID);
+            map.put(Constants.{{service_name_upper}}_ID_RQST, primaryID);
             response.setResult(map);
             response.setResponseCode(HttpStatus.OK);
-            log.info("LiveStockServiceImpl::createLiveStock::persited livestock in Verg");
+            log.info("{{service_name_pascal}}ServiceImpl::create{{service_name_pascal}}::persisted {{service_name_camel}} in Verg");
             return response;
 
         } catch (Exception e) {
-
             throw new CustomException("error while processing", e.getMessage(),
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @Override
-    public CustomResponse searchLiveStock(SearchCriteria searchCriteria) {
-        log.info("LiveStockServiceImpl::searchDemand");
+    public CustomResponse search{{service_name_pascal}}(SearchCriteria searchCriteria) {
+        log.info("{{service_name_pascal}}ServiceImpl::search{{service_name_pascal}}");
         CustomResponse response = new CustomResponse();
         SearchResult searchResult = redisTemplate.opsForValue()
                 .get(generateRedisJwtTokenKey(searchCriteria));
         if (searchResult != null) {
-            log.info("LiveStockServiceImpl::searchLiveStock: livestock search result fetched from redis");
+            log.info("{{service_name_pascal}}ServiceImpl::search{{service_name_pascal}}: {{service_name_camel}} search result fetched from redis");
             response.getResult().put(Constants.RESULT, searchResult);
             createSuccessResponse(response);
             return response;
@@ -134,7 +133,7 @@ public class LiveStockServiceImpl implements LiveStockService {
         }
         try {
             searchResult =
-                    esUtilService.searchDocuments(Constants.LIVESTOCK_INDEX_NAME, searchCriteria);
+                    esUtilService.searchDocuments(Constants.{{service_name_upper}}_INDEX_NAME, searchCriteria);
             response.getResult().put(Constants.RESULT, searchResult);
             createSuccessResponse(response);
             return response;
@@ -149,16 +148,15 @@ public class LiveStockServiceImpl implements LiveStockService {
     }
 
     @Override
-    public CustomResponse assignLiveStock(JsonNode liveStockEntity, String token) {
+    public CustomResponse assign{{service_name_pascal}}(JsonNode {{service_name_camel}}Entity, String token) {
         return null;
     }
 
     @Override
     public CustomResponse read(String id) {
-        log.info("InterestServiceImpl::read:inside the method");
+        log.info("{{service_name_pascal}}ServiceImpl::read:inside the method");
         CustomResponse response = new CustomResponse();
         if (StringUtils.isEmpty(id)) {
-            //logger.error("InterestServiceImpl::read:Id not found");
             response.setResponseCode(HttpStatus.INTERNAL_SERVER_ERROR);
             response.setMessage(Constants.ID_NOT_FOUND);
             return response;
@@ -166,33 +164,31 @@ public class LiveStockServiceImpl implements LiveStockService {
         try {
             String cachedJson = cacheService.getCache(id);
             if (StringUtils.isNotEmpty(cachedJson)) {
-                log.info("InterestServiceImpl::read:Record coming from redis cache");
+                log.info("{{service_name_pascal}}ServiceImpl::read:Record coming from redis cache");
                 response.setMessage(Constants.SUCCESSFULLY_READING);
                 response
                         .getResult()
                         .put(Constants.RESULT, objectMapper.readValue(cachedJson, new TypeReference<Object>() {
                         }));
             } else {
-                Optional<LiveStockEntity> entityOptional = liveStockRepository.findById(id);
+                Optional<{{service_name_pascal}}Entity> entityOptional = {{service_name_camel}}Repository.findById(id);
                 if (entityOptional.isPresent()) {
-                    LiveStockEntity liveStockEntity = entityOptional.get();
-                    cacheService.putCache(id, liveStockEntity.getData());
-                    log.info("InterestServiceImpl::read:Record coming from postgres db");
+                    {{service_name_pascal}}Entity {{service_name_camel}}Entity = entityOptional.get();
+                    cacheService.putCache(id, {{service_name_camel}}Entity.getData());
+                    log.info("{{service_name_pascal}}ServiceImpl::read:Record coming from postgres db");
                     response.setMessage(Constants.SUCCESSFULLY_READING);
                     response
                             .getResult()
                             .put(Constants.RESULT,
                                     objectMapper.convertValue(
-                                            liveStockEntity.getData(), new TypeReference<Object>() {
+                                            {{service_name_camel}}Entity.getData(), new TypeReference<Object>() {
                                             }));
                 } else {
-                    //logger.error("Invalid Id: {}", id);
                     response.setResponseCode(HttpStatus.NOT_FOUND);
                     response.setMessage(Constants.INVALID_ID);
                 }
             }
         } catch (Exception e) {
-            //logger.error("Error while mapping JSON for id {}: {}", id, e.getMessage(), e);
             throw new CustomException(Constants.ERROR, "error while processing",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
@@ -218,7 +214,7 @@ public class LiveStockServiceImpl implements LiveStockService {
                         .withClaim(Constants.REQUEST_PAYLOAD, reqJsonString)
                         .sign(Algorithm.HMAC256(Constants.JWT_SECRET_KEY));
             } catch (JsonProcessingException e) {
-                //logger.error("Error occurred while converting json object to json string", e);
+                // logger.error("Error occurred while converting json object to json string", e);
             }
         }
         return "";

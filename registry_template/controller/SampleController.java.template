@@ -1,35 +1,35 @@
-package com.registry.verg.livestock.controller;
+package com.registry.verg.{{service_name_lower}}.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.registry.verg.core.dto.CustomResponse;
 import com.registry.verg.core.elasticsearch.dto.SearchCriteria;
-import com.registry.verg.livestock.service.LiveStockService;
+import com.registry.verg.{{service_name_lower}}.service.{{service_name_pascal}}Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/livestock")
-public class LiveStockController {
+@RequestMapping("/{{service_name_lower}}")
+public class {{service_name_pascal}}Controller {
     @Autowired
-    private LiveStockService liveStockService;
+    private {{service_name_pascal}}Service {{service_name_camel}}Service;
 
     @PostMapping("/v1/create")
-    public ResponseEntity<CustomResponse> create(@RequestBody JsonNode liveStockDetails) {
-        CustomResponse response = liveStockService.createLiveStock(liveStockDetails);
+    public ResponseEntity<CustomResponse> create(@RequestBody JsonNode {{service_name_camel}}Details) {
+        CustomResponse response = {{service_name_camel}}Service.create{{service_name_pascal}}({{service_name_camel}}Details);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @PostMapping("/v1/search")
     public ResponseEntity<?> search(@RequestBody SearchCriteria searchCriteria) {
-        CustomResponse response = liveStockService.searchLiveStock(searchCriteria);
+        CustomResponse response = {{service_name_camel}}Service.search{{service_name_pascal}}(searchCriteria);
         return new ResponseEntity<>(response, response.getResponseCode());
     }
 
     @GetMapping("/v1/read/{id}")
     public ResponseEntity<?> read(@PathVariable String id) {
-        CustomResponse response = liveStockService.read(id);
+        CustomResponse response = {{service_name_camel}}Service.read(id);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 }

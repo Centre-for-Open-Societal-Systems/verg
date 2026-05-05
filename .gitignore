@@ -54,3 +54,7 @@ tests/output/
 ### AI Tooling ###
 .gemini/
 .kiro/
+
+
+### sample data ###
+data.json

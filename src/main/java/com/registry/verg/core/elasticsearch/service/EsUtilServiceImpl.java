@@ -59,7 +59,7 @@ public class EsUtilServiceImpl implements ESUtilService {
 
     @Override
     public Result addDocument(String esIndexName, String type, String id,
-            Map<String, Object> document, String jsonFilePath) throws IOException {
+                              Map<String, Object> document, String jsonFilePath) throws IOException {
         log.info("EsUtilServiceImpl :: addDocument");
         try {
             Map<String, Object> schema = loadSchema(jsonFilePath);
@@ -81,7 +81,7 @@ public class EsUtilServiceImpl implements ESUtilService {
 
     @Override
     public Result updateDocument(String index, String indexType, String entityId,
-            Map<String, Object> updatedDocument, String jsonFilePath) throws IOException {
+                                 Map<String, Object> updatedDocument, String jsonFilePath) throws IOException {
         try {
             Map<String, Object> schema = loadSchema(jsonFilePath);
             updatedDocument.keySet().retainAll(schema.keySet());
@@ -201,7 +201,7 @@ public class EsUtilServiceImpl implements ESUtilService {
 
     @Override
     public BulkResponse saveAll(String esIndexName, String type,
-            List<JsonNode> entities) throws IOException {
+                                List<JsonNode> entities) throws IOException {
         try {
             log.info("EsUtilServiceImpl :: saveAll");
             List<BulkOperation> operations = entities.stream().map(entity -> {
@@ -243,8 +243,7 @@ public class EsUtilServiceImpl implements ESUtilService {
         BoolQuery.Builder boolBuilder = new BoolQuery.Builder();
         List<Map<String, Object>> mustNotConditions = new ArrayList<>();
 
-        if (filterCriteriaMap == null)
-            return boolBuilder;
+        if (filterCriteriaMap == null) return boolBuilder;
 
         filterCriteriaMap.forEach((field, value) -> {
             if (field.equals("must_not") && value instanceof List) {
@@ -307,18 +306,12 @@ public class EsUtilServiceImpl implements ESUtilService {
         for (Entry<String, Object> entry : queryMap.entrySet()) {
             Map<String, Object> value = (Map<String, Object>) entry.getValue();
             switch (entry.getKey()) {
-                case Constants.BOOL:
-                    return buildBoolQueryFromMap(value);
-                case Constants.TERM:
-                    return buildTermQueryFromMap(value);
-                case Constants.TERMS:
-                    return buildTermsQueryFromMap(value);
-                case Constants.MATCH:
-                    return buildMatchQueryFromMap(value);
-                case Constants.RANGE:
-                    return buildRangeQueryFromMap(value);
-                default:
-                    throw new IllegalArgumentException(Constants.UNSUPPORTED_QUERY + entry.getKey());
+                case Constants.BOOL:  return buildBoolQueryFromMap(value);
+                case Constants.TERM:  return buildTermQueryFromMap(value);
+                case Constants.TERMS: return buildTermsQueryFromMap(value);
+                case Constants.MATCH: return buildMatchQueryFromMap(value);
+                case Constants.RANGE: return buildRangeQueryFromMap(value);
+                default: throw new IllegalArgumentException(Constants.UNSUPPORTED_QUERY + entry.getKey());
             }
         }
         return Query.of(q -> q.matchAll(m -> m));
@@ -378,23 +371,14 @@ public class EsUtilServiceImpl implements ESUtilService {
         conditions.forEach((op, val) -> {
             switch (op) {
                 case "gt":
-                case Constants.SEARCH_OPERATION_GREATER_THAN:
-                    builder.gt(JsonData.of(val));
-                    break;
+                case Constants.SEARCH_OPERATION_GREATER_THAN:      builder.gt(JsonData.of(val));  break;
                 case "gte":
-                case Constants.SEARCH_OPERATION_GREATER_THAN_EQUALS:
-                    builder.gte(JsonData.of(val));
-                    break;
+                case Constants.SEARCH_OPERATION_GREATER_THAN_EQUALS: builder.gte(JsonData.of(val)); break;
                 case "lt":
-                case Constants.SEARCH_OPERATION_LESS_THAN:
-                    builder.lt(JsonData.of(val));
-                    break;
+                case Constants.SEARCH_OPERATION_LESS_THAN:         builder.lt(JsonData.of(val));  break;
                 case "lte":
-                case Constants.SEARCH_OPERATION_LESS_THAN_EQUALS:
-                    builder.lte(JsonData.of(val));
-                    break;
-                default:
-                    throw new IllegalArgumentException(Constants.UNSUPPORTED_RANGE + op);
+                case Constants.SEARCH_OPERATION_LESS_THAN_EQUALS:  builder.lte(JsonData.of(val)); break;
+                default: throw new IllegalArgumentException(Constants.UNSUPPORTED_RANGE + op);
             }
         });
         return builder;
@@ -405,8 +389,7 @@ public class EsUtilServiceImpl implements ESUtilService {
     // -------------------------------------------------------------------------
 
     private Map<String, Aggregation> buildAggregations(List<String> facets) {
-        if (facets == null)
-            return Collections.emptyMap();
+        if (facets == null) return Collections.emptyMap();
         Map<String, Aggregation> aggs = new HashMap<>();
         facets.forEach(field -> aggs.put(field + "_agg",
                 Aggregation.of(a -> a.terms(t -> t.field(field + ".keyword").size(250)))));
@@ -416,8 +399,7 @@ public class EsUtilServiceImpl implements ESUtilService {
     private <T> Map<String, List<FacetDTO>> extractFacetData(
             SearchResponse<T> response, SearchCriteria searchCriteria) {
         Map<String, List<FacetDTO>> result = new HashMap<>();
-        if (searchCriteria.getFacets() == null)
-            return result;
+        if (searchCriteria.getFacets() == null) return result;
         searchCriteria.getFacets().forEach(field -> {
             Aggregate agg = response.aggregations().get(field + "_agg");
             List<FacetDTO> facetList = agg.sterms().buckets().array().stream()
@@ -436,15 +418,13 @@ public class EsUtilServiceImpl implements ESUtilService {
     private Map<String, Object> loadSchema(String jsonFilePath) throws IOException {
         JsonSchemaFactory schemaFactory = JsonSchemaFactory.getInstance();
         InputStream schemaStream = schemaFactory.getClass().getResourceAsStream(jsonFilePath);
-        return objectMapper.readValue(schemaStream, new TypeReference<Map<String, Object>>() {
-        });
+        return objectMapper.readValue(schemaStream, new TypeReference<Map<String, Object>>() {});
     }
 
     private void addSort(SearchCriteria searchCriteria, SearchRequest.Builder searchBuilder) {
         if (isNotBlank(searchCriteria.getOrderBy()) && isNotBlank(searchCriteria.getOrderDirection())) {
             SortOrder order = Constants.ASC.equals(searchCriteria.getOrderDirection())
-                    ? SortOrder.Asc
-                    : SortOrder.Desc;
+                    ? SortOrder.Asc : SortOrder.Desc;
             String sortField = searchCriteria.getOrderBy() + Constants.KEYWORD;
             searchBuilder.sort(s -> s.field(f -> f.field(sortField).order(order)));
         }
@@ -457,10 +437,11 @@ public class EsUtilServiceImpl implements ESUtilService {
     }
 
     private boolean isRangeQuery(Map<String, Object> map) {
-        return map.keySet().stream().anyMatch(k -> k.equals(Constants.SEARCH_OPERATION_GREATER_THAN_EQUALS) ||
-                k.equals(Constants.SEARCH_OPERATION_LESS_THAN_EQUALS) ||
-                k.equals(Constants.SEARCH_OPERATION_GREATER_THAN) ||
-                k.equals(Constants.SEARCH_OPERATION_LESS_THAN));
+        return map.keySet().stream().anyMatch(k ->
+                k.equals(Constants.SEARCH_OPERATION_GREATER_THAN_EQUALS) ||
+                        k.equals(Constants.SEARCH_OPERATION_LESS_THAN_EQUALS) ||
+                        k.equals(Constants.SEARCH_OPERATION_GREATER_THAN) ||
+                        k.equals(Constants.SEARCH_OPERATION_LESS_THAN));
     }
 
     private boolean isNotBlank(String value) {

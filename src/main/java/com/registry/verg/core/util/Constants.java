@@ -6,6 +6,7 @@ public class Constants{
     public static final String ACTIVE = "ACTIVE";
     public static final String IN_ACTIVE = "INACTIVE";
     public static final String SUCCESSFULLY_CREATED = "successfully created";
+    public static final String SUCCESSFULLY_DELETED = "successfully deleted";
     public static final String RESULT = "result";
     public static final String FAILED_CONST = "FAILED";
     public static final String ID = "id";
@@ -59,19 +60,6 @@ public class Constants{
     public static final String SAMPLE_ID_RQST = "sampleId";
     public static final String INTEREST_INDEX_NAME = "sampleIndex";
 
-
-    // Livestock Specific Constants
-    public static final String LIVESTOCK_VALIDATION_FILE_JSON = "/payloadValidation/liveStockPayloadValidation.json";
-    public static final String LIVESTOCK_ID_RQST = "liveStockId";
-    public static final String LIVESTOCK_INDEX_NAME = "livestock_index";
-
-    // Crop Specific Constants
-    public static final String CROP_VALIDATION_FILE_JSON = "/payloadValidation/cropPayloadValidation.json";
-    public static final String CROP_ID_RQST = "cropId";
-    public static final String CROP_INDEX_NAME = "crop_index";
-
-
-
-    private Constants() {
+        private Constants() {
     }
 }
