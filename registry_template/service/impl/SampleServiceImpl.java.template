@@ -18,6 +18,7 @@ import com.registry.verg.core.exception.CustomException;
 import com.registry.verg.core.util.Constants;
 import com.registry.verg.core.util.PayloadValidation;
 import com.registry.verg.core.util.VergProperties;
+import com.registry.verg.core.util.PrimaryKeyUtil;
 import com.registry.verg.{{service_name_lower}}.entity.{{service_name_pascal}}Entity;
 import com.registry.verg.{{service_name_lower}}.repository.{{service_name_pascal}}Repository;
 import com.registry.verg.{{service_name_lower}}.service.{{service_name_pascal}}Service;
@@ -43,6 +44,9 @@ import java.util.concurrent.TimeUnit;
 public class {{service_name_pascal}}ServiceImpl implements {{service_name_pascal}}Service {
     @Autowired
     private PayloadValidation payloadValidation;
+
+    @Autowired
+    private PrimaryKeyUtil primaryKeyUtil;
 
     @Autowired
     private {{service_name_pascal}}Repository {{service_name_camel}}Repository;
@@ -78,8 +82,7 @@ public class {{service_name_pascal}}ServiceImpl implements {{service_name_pascal
             log.info("{{service_name_pascal}}ServiceImpl::create{{service_name_pascal}}:creating {{service_name_camel}}");
             {{service_name_pascal}}Entity {{service_name_camel}}Entity1 = new {{service_name_pascal}}Entity();
             // Generate Primary Key
-            UUID idUuid = Uuids.timeBased();
-            String primaryID = String.valueOf(idUuid);
+            String primaryID = primaryKeyUtil.generateKey(Constants.{{service_name_upper}}_VALIDATION_FILE_JSON);
             {{service_name_camel}}Entity1.set{{service_name_pascal}}Id(primaryID);
             // Create Parameters like createdDate / updateDate / Data and Status
             Timestamp currentTime = new Timestamp(System.currentTimeMillis());
@@ -92,8 +95,6 @@ public class {{service_name_pascal}}ServiceImpl implements {{service_name_pascal
 
             log.info("{{service_name_pascal}}ServiceImpl::create{{service_name_pascal}}::persisted {{service_name_camel}} in postgres");
             ObjectNode jsonNode = objectMapper.createObjectNode();
-            jsonNode.put("{{service_name_pascal}}ID",
-                    {{service_name_camel}}Entity.get(Constants.{{service_name_upper}}_ID_RQST).asText());
             jsonNode.setAll((ObjectNode) {{service_name_camel}}Entity);
             Map<String, Object> map = objectMapper.convertValue(jsonNode, Map.class);
             esUtilService.addDocument(Constants.{{service_name_upper}}_INDEX_NAME, Constants.INDEX_TYPE,

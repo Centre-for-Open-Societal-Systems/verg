@@ -106,10 +106,12 @@ class CreateRegistry:
             "properties": {
                 f"{self.camel}Id": {
                     "type": "string",
+                    "prefix": f"{self.camel}-",
+                    "key" : "primary",
                     "description": f"description about {self.camel}Id"
                 }
             },
-            "required": [f"{self.camel}Id"]
+            "required": []
         }
         os.makedirs(os.path.dirname(output_path), exist_ok=True)
         with open(output_path, "w") as f:
